@@ -1,0 +1,2 @@
+- this is a .NET6 project
+- the project is a stardew valley mod displaying a icon if the player hasn't donated to the aquarium
