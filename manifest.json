@@ -1,0 +1,15 @@
+{
+  "Name": "Aquarium Fish Indicator",
+  "Author": "YourName",
+  "Version": "1.0.0",
+  "Description": "Shows donation status when hovering over fish items",
+  "UniqueID": "YourName.AquariumFishIndicator",
+  "EntryDll": "AquariumFishIndicator.dll",
+  "MinimumApiVersion": "3.0.0",
+  "Dependencies": [
+    {
+      "UniqueID": "Cherry.StardewAquarium",
+      "IsRequired": true
+    }
+  ]
+}
