@@ -62,7 +62,7 @@ namespace AquariumFishIndicator
 
         private void OnRenderedHud(object sender, RenderedHudEventArgs e)
         {
-            if (Game1.activeClickableMenu == null && config.ShowDonationStatus)
+            if (Game1.activeClickableMenu == null && config.ShowDonationStatus && config.UseIconIndicator)
             {
                 DrawFishDonationIndicator(e.SpriteBatch);
             }
@@ -70,7 +70,7 @@ namespace AquariumFishIndicator
 
         private void OnRenderedActiveMenu(object sender, RenderedActiveMenuEventArgs e)
         {
-            if (config.ShowDonationStatus)
+            if (config.ShowDonationStatus && config.UseIconIndicator)
             {
                 DrawFishDonationIndicator(e.SpriteBatch);
             }
