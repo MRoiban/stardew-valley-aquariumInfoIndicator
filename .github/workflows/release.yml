@@ -1,0 +1,81 @@
+name: Build and Release Mod
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0.0, v1.2.3, etc.
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '6.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build mod
+      run: dotnet build --configuration Release --no-restore
+      
+    - name: Get version from tag
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      
+    - name: Create release package
+      run: |
+        # Create release directory
+        mkdir -p release
+        
+        # Copy the built DLL
+        cp bin/Release/net6.0/AquariumFishIndicator.dll release/
+        
+        # Copy manifest.json
+        cp manifest.json release/
+        
+        # Copy assets if they exist
+        if [ -d "assets" ]; then
+          cp -r assets release/
+        fi
+        
+        # Create zip file
+        cd release
+        zip -r ../AquariumFishIndicator-v${{ steps.get_version.outputs.VERSION }}.zip .
+        cd ..
+        
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Aquarium Fish Indicator v${{ steps.get_version.outputs.VERSION }}
+        draft: false
+        prerelease: false
+        body: |
+          ## Aquarium Fish Indicator v${{ steps.get_version.outputs.VERSION }}
+          
+          ### Installation
+          1. Install [SMAPI](https://smapi.io/)
+          2. Install [Stardew Aquarium](https://www.nexusmods.com/stardewvalley/mods/6372) mod
+          3. Extract the zip file to your `Mods` folder
+          
+          ### Changes
+          - See commit history for detailed changes
+          
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./AquariumFishIndicator-v${{ steps.get_version.outputs.VERSION }}.zip
+        asset_name: AquariumFishIndicator-v${{ steps.get_version.outputs.VERSION }}.zip
+        asset_content_type: application/zip 
