@@ -17,3 +17,5 @@ game/Stardew Valley/steam_appid.txt
 # - Content files except large audio
 # - Data files
 # - Other small essential files
+game/Stardew Valley/Content/XACT/FarmerSounds.xgs
+game/Stardew Valley/Content/XACT/Sound Bank.xsb
