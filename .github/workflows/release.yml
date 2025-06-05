@@ -23,6 +23,10 @@ jobs:
       
     - name: Download and install SMAPI
       run: |
+        # Install required dependencies for SMAPI installer
+        sudo apt-get update
+        sudo apt-get install -y libnotify-bin
+        
         # Download SMAPI installer for developers
         curl -L -o smapi-installer.zip "https://github.com/Pathoschild/SMAPI/releases/download/4.2.1/SMAPI-4.2.1-installer-for-developers.zip"
         
