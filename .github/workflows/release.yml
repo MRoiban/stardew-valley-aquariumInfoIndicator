@@ -22,7 +22,7 @@ jobs:
       run: dotnet restore aquarium.sln
       
     - name: Build mod
-      run: dotnet build aquarium.sln --configuration Release --no-restore -p:EnableModDeploy=false -p:GamePath=/tmp/StardewValley
+      run: dotnet build aquarium.sln --configuration Release --no-restore -p:EnableModDeploy=false -p:GamePath="game/stardew valley"
       
     - name: Get version from tag
       id: get_version

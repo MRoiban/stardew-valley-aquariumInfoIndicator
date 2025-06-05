@@ -1,3 +1,19 @@
 obj
 .vscode
 .stfolder
+
+# Large audio files
+game/Stardew Valley/Content/XACT/*.xwb
+
+# Large binary files that aren't needed for mod building
+game/Stardew Valley/*.so
+game/Stardew Valley/*.dylib
+game/Stardew Valley/*.dll.config
+game/Stardew Valley/createdump
+game/Stardew Valley/steam_appid.txt
+
+# Keep essential files for building:
+# - .dll files (needed for compilation)
+# - Content files except large audio
+# - Data files
+# - Other small essential files
