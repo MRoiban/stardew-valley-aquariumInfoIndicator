@@ -41,6 +41,7 @@ namespace AquariumFishIndicator
         private ModConfig config;
         private Texture2D curatorEmojiTexture;        // Add a rendering event to track hovered items like UIInfoSuite2 does
         private Item _hoverItem;
+        private Point _lastMousePosition;
 
         public override void Entry(IModHelper helper)
         {
@@ -57,7 +58,12 @@ namespace AquariumFishIndicator
 
         private void OnRendering(object sender, EventArgs e)
         {
-            _hoverItem = GetHoveredItem();
+            Point currentMouse = new Point(Game1.getMouseX(), Game1.getMouseY());
+            if (currentMouse != _lastMousePosition)
+            {
+                _hoverItem = GetHoveredItem();
+                _lastMousePosition = currentMouse;
+            }
         }
 
         private void OnRenderedHud(object sender, RenderedHudEventArgs e)
