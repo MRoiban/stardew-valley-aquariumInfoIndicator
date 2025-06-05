@@ -21,6 +21,20 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore aquarium.sln
       
+    - name: Download and install SMAPI
+      run: |
+        # Download SMAPI installer for developers
+        curl -L -o smapi-installer.zip "https://github.com/Pathoschild/SMAPI/releases/download/4.2.1/SMAPI-4.2.1-installer-for-developers.zip"
+        
+        # Extract the installer
+        unzip smapi-installer.zip
+        
+        # Make the install script executable and run it
+        chmod +x "SMAPI 4.2.1 installer for developers/install on Linux.sh"
+        cd "SMAPI 4.2.1 installer for developers"
+        ./install\ on\ Linux.sh --game-path "../game/Stardew Valley"
+        cd ..
+      
     - name: Build mod
       run: dotnet build aquarium.sln --configuration Release --no-restore -p:EnableModDeploy=false -p:GamePath="game/Stardew Valley"
       
