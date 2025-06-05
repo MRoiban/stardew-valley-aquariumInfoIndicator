@@ -1,9 +1,9 @@
 {
   "Name": "Aquarium Fish Indicator",
-  "Author": "YourName",
+  "Author": "Deovos",
   "Version": "1.0.0",
-  "Description": "Shows donation status when hovering over fish items",
-  "UniqueID": "YourName.AquariumFishIndicator",
+  "Description": "Shows donation to aquarium status when hovering over fish items",
+  "UniqueID": "Deovos.AquariumFishIndicator",
   "EntryDll": "AquariumFishIndicator.dll",
   "MinimumApiVersion": "3.0.0",
   "Dependencies": [
