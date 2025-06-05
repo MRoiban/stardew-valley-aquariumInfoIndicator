@@ -1,0 +1,83 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Stardew Valley Modding Guide
+
+## Tools and Technologies
+
+### Core Tools
+- **SMAPI** - Stardew Modding API, the foundation for all mods
+- **Content Patcher** - For asset modifications (sprites, maps, data files) using JSON
+- **.NET 6** - Target framework (required for compatibility)
+
+### Development Approach
+- Use Content Patcher for static asset changes
+- Use C# mods for dynamic behavior and game logic
+- Combine both approaches for complex mods (separation of concerns)
+
+## Project Structure
+
+The current project follows this structure:
+```
+./
+├── [ModEntry.cs](mdc:ModEntry.cs) - Main mod entry point
+├── [ModConfig.cs](mdc:ModConfig.cs) - Configuration class  
+├── [manifest.json](mdc:manifest.json) - Mod metadata and dependencies
+├── [AquariumFishIndicator.csproj](mdc:AquariumFishIndicator.csproj) - Project file
+├── ./framework/ - C# framework code
+├── ./handlers/ - Event and logic handlers
+├── ./docs/ - Documentation
+├── ./[CP] MOD_NAME/ - Content Patcher assets (if needed)
+├── ./i18n/ - Translation files
+└── ./assets/ - Mod assets (sprites, etc.)
+```
+
+## Key Files
+
+### ModEntry.cs
+- Must inherit from `Mod` class
+- Implement `Entry(IModHelper helper)` method
+- Register event handlers here
+- Main entry point called by SMAPI
+
+### manifest.json
+Required fields:
+- `Name`, `Author`, `Version`, `Description`
+- `UniqueID` (format: author.modname)
+- `EntryDll` (usually ProjectName.dll)
+- `MinimumApiVersion` (use "4.0.0" minimum)
+
+### Project File (.csproj)
+- Target .NET 6
+- Reference `Pathoschild.Stardew.ModBuildConfig` NuGet package
+- Include `<LangVersion>Latest</LangVersion>` if using modern C# features
+- Set `GamePath` property if auto-detection fails
+
+## Common Patterns
+
+### Event Handling
+```csharp
+// In Entry method
+helper.Events.Input.ButtonPressed += OnButtonPressed;
+helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+```
+
+### Context Checking
+```csharp
+if (!Context.IsWorldReady)
+    return; // Player hasn't loaded a save yet
+```
+
+### Logging
+```csharp
+this.Monitor.Log("Message", LogLevel.Debug);
+```
+
+## Development Notes
+
+- Always check `Context.IsWorldReady` before accessing game state
+- Use SMAPI's helper APIs instead of direct game access when possible
+- Follow SMAPI's event lifecycle for proper mod initialization
+- Test mods in both single-player and multiplayer scenarios
