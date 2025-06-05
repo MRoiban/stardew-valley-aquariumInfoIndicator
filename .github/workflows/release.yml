@@ -19,10 +19,10 @@ jobs:
         dotnet-version: '6.0.x'
         
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore aquarium.sln
       
     - name: Build mod
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build aquarium.sln --configuration Release --no-restore
       
     - name: Get version from tag
       id: get_version
