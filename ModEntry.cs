@@ -142,49 +142,149 @@ namespace AquariumFishIndicator
         }
         private void DrawCuratorIcon(SpriteBatch spriteBatch, Item hoveredItem)
         {
-            // Calculate tooltip dimensions like UIInfoSuite2 does
+            // Only draw if there's actually a tooltip being shown
+            if (Game1.activeClickableMenu != null)
+            {
+                // For menu contexts, position relative to the menu
+                var menu = Game1.activeClickableMenu;
+                if (menu is ItemGrabMenu || menu is GameMenu)
+                {
+                    DrawIconForMenu(spriteBatch, hoveredItem, menu);
+                }
+            }
+            else
+            {
+                // For HUD/toolbar context, position relative to cursor
+                DrawIconForHud(spriteBatch, hoveredItem);
+            }
+        }
+
+        private void DrawIconForMenu(SpriteBatch spriteBatch, Item hoveredItem, IClickableMenu menu)
+        {
+            // Calculate tooltip dimensions
             string hoverText = hoveredItem.getDescription();
             string hoverTitle = hoveredItem.DisplayName;
-
-            // Get the mouse position for tooltip calculation
-            int mouseX = Game1.getMouseX();
-            int mouseY = Game1.getMouseY();
-
-            // Calculate tooltip text dimensions
+            
             Vector2 titleSize = Game1.smallFont.MeasureString(hoverTitle);
             Vector2 textSize = Game1.smallFont.MeasureString(hoverText);
-
-            // Calculate window width and height like the game does for tooltips
-            int windowWidth = Math.Max((int)titleSize.X, (int)textSize.X) + 32; // Add padding
-            int windowHeight = (int)(titleSize.Y + textSize.Y) + 32; // Add padding for title and description
-
-            // Calculate tooltip position (same logic as IClickableMenu.drawHoverText)
-            int x = mouseX + 32;
-            int y = mouseY + 32;
-
+            
+            int windowWidth = Math.Max((int)titleSize.X, (int)textSize.X) + 32;
+            int windowHeight = (int)(titleSize.Y + textSize.Y) + 32;
+            
+            int mouseX = Game1.getMouseX();
+            int mouseY = Game1.getMouseY();
+            
+            // Calculate tooltip position
+            int tooltipX = mouseX + 32;
+            int tooltipY = mouseY + 32;
+            
             // Adjust if tooltip would go off screen
-            if (x + windowWidth > Game1.uiViewport.Width)
+            if (tooltipX + windowWidth > Game1.uiViewport.Width)
             {
-                x = Game1.uiViewport.Width - windowWidth;
+                tooltipX = Game1.uiViewport.Width - windowWidth;
             }
-            if (y + windowHeight > Game1.uiViewport.Height)
+            if (tooltipY + windowHeight > Game1.uiViewport.Height)
             {
-                y = mouseY - windowHeight - 16;
+                tooltipY = mouseY - windowHeight - 16;
             }
-            // Position icon in upper-right corner of tooltip window
-            Vector2 iconPosition = new Vector2(x + windowWidth - 25, y - 4); // 30px from right edge (accounting for icon size), 2px from top
+            
+            // Calculate icon position based on configuration
+            Vector2 iconPosition = CalculateIconPosition(tooltipX, tooltipY, windowWidth, windowHeight);
+            
+            DrawIcon(spriteBatch, iconPosition);
+        }
 
-            // Draw the custom curator emoji icon
+        private void DrawIconForHud(SpriteBatch spriteBatch, Item hoveredItem)
+        {
+            // For HUD context, position icon near the cursor but offset to avoid overlap
+            int mouseX = Game1.getMouseX();
+            int mouseY = Game1.getMouseY();
+            
+            Vector2 iconPosition;
+            
+            if (config.IconPosition == IconPosition.FollowCursor)
+            {
+                // Position icon to the upper-right of cursor, with safe margins
+                iconPosition = new Vector2(
+                    mouseX + 48 + config.IconOffsetX, 
+                    mouseY - 32 + config.IconOffsetY
+                );
+                
+                // Ensure icon stays within screen bounds
+                int iconSize = (int)(32 * config.IconScale);
+                if (iconPosition.X + iconSize > Game1.uiViewport.Width)
+                {
+                    iconPosition.X = mouseX - 48 + config.IconOffsetX; // Move to left side of cursor
+                }
+                if (iconPosition.Y < 0)
+                {
+                    iconPosition.Y = mouseY + 32 + config.IconOffsetY; // Move below cursor
+                }
+            }
+            else
+            {
+                // Use fixed positioning based on config
+                iconPosition = new Vector2(mouseX + 48 + config.IconOffsetX, mouseY - 32 + config.IconOffsetY);
+            }
+            
+            DrawIcon(spriteBatch, iconPosition);
+        }
+
+        private Vector2 CalculateIconPosition(int tooltipX, int tooltipY, int windowWidth, int windowHeight)
+        {
+            Vector2 position;
+            int iconSize = (int)(32 * config.IconScale);
+            
+            switch (config.IconPosition)
+            {
+                case IconPosition.TopLeft:
+                    position = new Vector2(tooltipX + 8, tooltipY + 8);
+                    break;
+                case IconPosition.TopRight:
+                    position = new Vector2(tooltipX + windowWidth - iconSize - 8, tooltipY + 8);
+                    break;
+                case IconPosition.BottomLeft:
+                    position = new Vector2(tooltipX + 8, tooltipY + windowHeight - iconSize - 8);
+                    break;
+                case IconPosition.BottomRight:
+                    position = new Vector2(tooltipX + windowWidth - iconSize - 8, tooltipY + windowHeight - iconSize - 8);
+                    break;
+                default: // TopRight
+                    position = new Vector2(tooltipX + windowWidth - iconSize - 8, tooltipY + 8);
+                    break;
+            }
+            
+            // Apply custom offsets
+            position.X += config.IconOffsetX;
+            position.Y += config.IconOffsetY;
+            
+            return position;
+        }
+
+        private void DrawIcon(SpriteBatch spriteBatch, Vector2 position)
+        {
+            // Draw a subtle background circle for better visibility if enabled
+            if (config.ShowIconBackground)
+            {
+                int iconSize = (int)(32 * config.IconScale);
+                spriteBatch.Draw(
+                    Game1.fadeToBlackRect,
+                    new Rectangle((int)position.X - 2, (int)position.Y - 2, iconSize + 4, iconSize + 4),
+                    Color.Black * 0.5f
+                );
+            }
+            
+            // Draw the curator emoji icon
             spriteBatch.Draw(
                 curatorEmojiTexture,
-                iconPosition,
-                null, // Use entire texture
+                position,
+                null,
                 Color.White,
                 0f,
                 Vector2.Zero,
-                2.5f, // Scale (make it 2x size)
+                config.IconScale,
                 SpriteEffects.None,
-                0.86f // Same layer depth as UIInfoSuite2 uses
+                0.86f
             );
         }
     }
