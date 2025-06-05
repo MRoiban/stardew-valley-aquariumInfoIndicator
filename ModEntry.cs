@@ -48,8 +48,20 @@ namespace AquariumFishIndicator
             this.helper = helper;
             this.config = helper.ReadConfig<ModConfig>();
 
-            // Load the curator emoji texture
-            this.curatorEmojiTexture = helper.ModContent.Load<Texture2D>("assets/tilesheet/curator_emoji.png");
+            // Load the curator emoji texture with error handling
+            try
+            {
+                this.curatorEmojiTexture = helper.ModContent.Load<Texture2D>("assets/tilesheet/curator_emoji.png");
+                if (this.curatorEmojiTexture == null)
+                {
+                    this.Monitor.Log("Failed to load curator emoji texture - texture is null", LogLevel.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.Monitor.Log($"Error loading curator emoji texture: {ex.Message}", LogLevel.Error);
+                this.curatorEmojiTexture = null; // Ensure it's explicitly null
+            }
 
             helper.Events.Display.RenderedHud += OnRenderedHud;
             helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
@@ -148,6 +160,12 @@ namespace AquariumFishIndicator
         }
         private void DrawCuratorIcon(SpriteBatch spriteBatch, Item hoveredItem)
         {
+            // Check if texture is available before drawing
+            if (this.curatorEmojiTexture == null)
+            {
+                return; // Gracefully skip drawing if texture is not available
+            }
+
             // Calculate tooltip dimensions like UIInfoSuite2 does
             string hoverText = hoveredItem.getDescription();
             string hoverTitle = hoveredItem.DisplayName;
